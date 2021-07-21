@@ -748,7 +748,7 @@ async def ytplay(_, message: Message):
     try:
         user = await USER.get_me()
     except:
-        user.first_name = "Ilo Music
+        user.first_name = "Ilo Music"
     usar = user
     wew = usar.id
     try:
