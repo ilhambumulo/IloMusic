@@ -897,7 +897,7 @@ async def deezer(client: Client, message_: Message):
     try:
         user = await USER.get_me()
     except:
-        user.first_name = "Ilo Music
+        user.first_name = "Ilo Music"
     usar = user
     wew = usar.id
     try:
