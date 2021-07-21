@@ -170,14 +170,14 @@ def updated_stats(chat, queue, vol=100):
 
 def r_ply(type_):
     if type_ == "play":
-        pass
+        ico = '▶'
     else:
-        pass
+        ico = '⏸'
     mar = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton("⏹", "leave"),
-                InlineKeyboardButton("⏸", "puse"),
+                InlineKeyboardButton("⏸", "pause"),
                 InlineKeyboardButton("▶️", "resume"),
                 InlineKeyboardButton("⏭", "skip"),
             ],
@@ -322,11 +322,11 @@ async def m_cb(b, cb):
         if (chet_id not in callsmusic.pytgcalls.active_calls) or (
             callsmusic.pytgcalls.active_calls[chet_id] == "paused"
         ):
-            await cb.answer("Chat is not connected!", show_alert=True)
+            await cb.answer("Assistant Sedang Tidak Terhubung dengan VCG!", show_alert=True)
         else:
             callsmusic.pytgcalls.pause_stream(chet_id)
 
-            await cb.answer("Music Paused!")
+            await cb.answer("Music Dijeda!")
             await cb.message.edit(
                 updated_stats(m_chat, qeue), reply_markup=r_ply("play")
             )
@@ -335,7 +335,7 @@ async def m_cb(b, cb):
         if (chet_id not in callsmusic.pytgcalls.active_calls) or (
             callsmusic.pytgcalls.active_calls[chet_id] == "playing"
         ):
-            await cb.answer("Chat is not connected!", show_alert=True)
+            await cb.answer("Assistant Sedang Tidak Terhubung dengan VCG!", show_alert=True)
         else:
             callsmusic.pytgcalls.resume_stream(chet_id)
             await cb.answer("Music Resumed!")
@@ -401,7 +401,7 @@ async def m_cb(b, cb):
                 [
                     InlineKeyboardButton("📖 Playlist", "playlist"),
                 ],
-                [InlineKeyboardButton("❌ Close", "cls")],
+                [InlineKeyboardButton("🗑 Close", "cls")],
             ]
         )
         await cb.message.edit(stats, reply_markup=marr)
@@ -409,14 +409,14 @@ async def m_cb(b, cb):
         if qeue:
             qeue.pop(0)
         if chet_id not in callsmusic.pytgcalls.active_calls:
-            await cb.answer("Chat is not connected!", show_alert=True)
+            await cb.answer("Assistant Sedang Tidak Terhubung dengan VCG!", show_alert=True)
         else:
             callsmusic.queues.task_done(chet_id)
 
             if callsmusic.queues.is_empty(chet_id):
                 callsmusic.pytgcalls.leave_group_call(chet_id)
 
-                await cb.message.edit("- No More Playlist..\n- Leaving VC!")
+                await cb.message.edit("- Tidak Ada Lagi Daftar Putar\n- Meninggalkan VCG!")
             else:
                 callsmusic.pytgcalls.change_stream(
                     chet_id, callsmusic.queues.get(chet_id)["file"]
@@ -424,7 +424,7 @@ async def m_cb(b, cb):
                 await cb.answer("Skipped")
                 await cb.message.edit((m_chat, qeue), reply_markup=r_ply(the_data))
                 await cb.message.reply_text(
-                    f"- Skipped track\n- Now Playing **{qeue[0][0]}**"
+                    f"- Melewati lagu\n- Sekarang Memutar Lagu **{qeue[0][0]}**"
                 )
 
     else:
@@ -435,9 +435,9 @@ async def m_cb(b, cb):
                 pass
 
             callsmusic.pytgcalls.leave_group_call(chet_id)
-            await cb.message.edit("Successfully Left the Chat!")
+            await cb.message.edit("Berhasil Keluar dari Group!")
         else:
-            await cb.answer("Chat is not connected!", show_alert=True)
+            await cb.answer("Assistant Sedang Tidak Terhubung dengan VCG!", show_alert=True)
 
 
 @Client.on_message(command("play") & other_filters)
@@ -453,7 +453,7 @@ async def play(_, message: Message):
     try:
         user = await USER.get_me()
     except:
-        user.first_name = "GeezProject"
+        user.first_name = "Ilo Music"
     usar = user
     wew = usar.id
     try:
@@ -523,24 +523,35 @@ async def play(_, message: Message):
         else None
     )
     if audio:
-        if round(audio.duration / 60) > DURATION_LIMIT:
+        if round(audio.duration / 90) > DURATION_LIMIT:
             raise DurationLimitError(
                 f"❌ **Lagu dengan durasi lebih dari** `{DURATION_LIMIT}` **menit tidak boleh diputar!**"
             )
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("📌 Groups", url="https://t.me/GeezSupportGroup"),
-                    InlineKeyboardButton("⛑ Channel", url="https://t.me/GeezProjets"),
+                    InlineKeyboardButton("📖 Daftar Putar", callback_data="playlist"),
+                    InlineKeyboardButton('Menu ⏯ ', callback_data='menu'),
+                    
+                ],                     
+                [
+                    InlineKeyboardButton(
+                        "⛑ Channel", url="https://t.me/infoiam"
+                    )
                 ],
-                [InlineKeyboardButton(text="🗑 Close", callback_data="cls")],
+                [       
+                    InlineKeyboardButton(
+                        text="🗑 Close",
+                        callback_data='cls')
+
+                ]                             
             ]
         )
         file_name = get_file_name(audio)
         title = file_name
         thumb_name = "https://telegra.ph/file/fa2cdb8a14a26950da711.png"
         thumbnail = thumb_name
-        duration = round(audio.duration / 60)
+        duration = round(audio.duration / 90)
         views = "Locally added"
         requested_by = message.from_user.first_name
         await generate_cover(requested_by, title, views, duration, thumbnail)
@@ -577,10 +588,21 @@ async def play(_, message: Message):
         keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("📌 Groups", url="https://t.me/GeezSupportGroup"),
-                    InlineKeyboardButton("⛑ Channel", url="https://t.me/GeezProjects"),
+                    InlineKeyboardButton("📖 Daftar Putar", callback_data="playlist"),
+                    InlineKeyboardButton('Menu ⏯ ', callback_data='menu'),
+                    
+                ],                     
+                [
+                    InlineKeyboardButton(
+                        "⛑ Channel", url="https://t.me/infoiam"
+                    )
                 ],
-                [InlineKeyboardButton(text="🗑 Close", callback_data="cls")],
+                [       
+                    InlineKeyboardButton(
+                        text="🗑 Close",
+                        callback_data='cls')
+
+                ]                             
             ]
         )
         requested_by = message.from_user.first_name
@@ -653,18 +675,29 @@ async def play(_, message: Message):
                 return
             dlurl=url
             dlurl=dlurl.replace("youtube","youtubepp")
-            keyboard = InlineKeyboardMarkup(
+        keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("📌 Groups", url="https://t.me/GeezSupportGroup"),
-                    InlineKeyboardButton("⛑ Channel", url="https://t.me/GeezProjects"),
+                    InlineKeyboardButton("📖 Daftar Putar", callback_data="playlist"),
+                    InlineKeyboardButton('Menu ⏯ ', callback_data='menu'),
+                    
+                ],                     
+                [
+                    InlineKeyboardButton(
+                        "⛑ Channel", url="https://t.me/infoiam"
+                    )
                 ],
-                [InlineKeyboardButton(text="🗑 Close", callback_data="cls")],
+                [       
+                    InlineKeyboardButton(
+                        text="🗑 Close",
+                        callback_data='cls')
+
+                ]                             
             ]
         )
-            requested_by = message.from_user.first_name
-            await generate_cover(requested_by, title, views, duration, thumbnail)
-            file_path = await convert(youtube.download(url))   
+        requested_by = message.from_user.first_name
+        await generate_cover(requested_by, title, views, duration, thumbnail)
+        file_path = await convert(youtube.download(url))   
     chat_id = get_chat_id(message.chat)
     if chat_id in callsmusic.pytgcalls.active_calls:
         position = await queues.put(chat_id, file=file_path)
@@ -715,7 +748,7 @@ async def ytplay(_, message: Message):
     try:
         user = await USER.get_me()
     except:
-        user.first_name = "GeezProject"
+        user.first_name = "Ilo Music
     usar = user
     wew = usar.id
     try:
@@ -792,14 +825,24 @@ async def ytplay(_, message: Message):
     dlurl=url
     dlurl=dlurl.replace("youtube","youtubepp")
     keyboard = InlineKeyboardMarkup(
+        [
             [
-                [
-                    InlineKeyboardButton("📌 Groups", url="https://t.me/GeezSupportGroup"),
-                    InlineKeyboardButton("⛑ Channel", url="https://t.me/GeezProjects"),
-                ],
-                [InlineKeyboardButton(text="🗑 Close", callback_data="cls")],
-            ]
-        )
+                InlineKeyboardButton("📖 Daftar Putar", callback_data="playlist"),
+                InlineKeyboardButton('Menu ⏯ ', callback_data='menu'),
+            ],                     
+            [
+                InlineKeyboardButton(
+                    "⛑ Channel", url="https://t.me/infoiam"
+                   )
+            ],
+            [       
+                InlineKeyboardButton(
+                    text="🗑 Close",
+                    callback_data='cls')
+
+            ]                             
+        ]
+    )
     requested_by = message.from_user.first_name
     await generate_cover(requested_by, title, views, duration, thumbnail)
     file_path = await convert(youtube.download(url))
@@ -854,7 +897,7 @@ async def deezer(client: Client, message_: Message):
     try:
         user = await USER.get_me()
     except:
-        user.first_name = "GeezProject"
+        user.first_name = "Ilo Music
     usar = user
     wew = usar.id
     try:
@@ -920,7 +963,7 @@ async def deezer(client: Client, message_: Message):
         await res.edit("**Tidak Ditemukan Lagu Apa Pun!**")
         return
     try:    
-        duuration= round(duration / 60)
+        duuration= round(duration / 90)
         if duuration > DURATION_LIMIT:
             await cb.message.edit(f"**Musik lebih lama dari** `{DURATION_LIMIT}` **menit tidak diperbolehkan diputar**")
             return
@@ -928,10 +971,24 @@ async def deezer(client: Client, message_: Message):
         pass    
     
     keyboard = InlineKeyboardMarkup(
-        [
-            [InlineKeyboardButton(text="⛑ Channel", url="https://t.me/GeezProjects")],
-        ]
-    )
+            [
+                [
+                    InlineKeyboardButton("📖 Daftar Putar", callback_data="playlist"),
+                    InlineKeyboardButton('Menu ⏯ ', callback_data='menu'),
+                ],                     
+                [
+                    InlineKeyboardButton(
+                        "⛑ Channel", url="https://t.me/infoiam"
+                    )
+                ],
+                [       
+                    InlineKeyboardButton(
+                        text="🗑 Close",
+                        callback_data='cls')
+
+                ]                             
+            ]
+        )
     file_path = await convert(wget.download(url))
     await res.edit("📥 **Generating Thumbnail**")
     await generate_cover(requested_by, title, artist, duration, thumbnail)
@@ -990,7 +1047,7 @@ async def lol_cb(b, cb):
     if cb.from_user.id != useer_id:
         await cb.answer("Anda bukan orang yang meminta untuk memutar lagu!", show_alert=True)
         return
-    await cb.message.edit("**Processing**")
+    await cb.message.edit("🔄 **Sedang Memproses Lagu**")
     x=int(x)
     try:
         useer_name = cb.message.reply_to_message.from_user.first_name
@@ -1006,7 +1063,7 @@ async def lol_cb(b, cb):
     url = f"https://youtube.com{resultss}"
     
     try:    
-        duuration= round(duration / 60)
+        duuration= round(duration / 90)
         if duuration > DURATION_LIMIT:
             await cb.message.edit(f"Lagu lebih lama dari {DURATION_LIMIT} menit tidak diperbolehkan diputar")
             return
@@ -1024,10 +1081,20 @@ async def lol_cb(b, cb):
     keyboard = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("📌 Groups", url="https://t.me/GeezSupportGroup"),
-                    InlineKeyboardButton("🛡️ Channel", url="https://t.me/GeezProjects"),
+                    InlineKeyboardButton("📖 Daftar Putar", callback_data="playlist"),
+                    InlineKeyboardButton('Menu ⏯ ', callback_data='menu'),
+                ],                     
+                [
+                    InlineKeyboardButton(
+                        "⛑ Channel", url="https://t.me/infoiam"
+                    )
                 ],
-                [InlineKeyboardButton(text="🗑 Close", callback_data="cls")],
+                [       
+                    InlineKeyboardButton(
+                        text="🗑 Close",
+                        callback_data='cls')
+
+                ]                             
             ]
         )
     requested_by = useer_name
